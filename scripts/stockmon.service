@@ -1,0 +1,21 @@
+# Run the monitor at boot.
+#   sudo cp scripts/stockmon.service /etc/systemd/system/
+#   sudo nano /etc/systemd/system/stockmon.service    # fix User / paths / secrets
+#   sudo systemctl daemon-reload && sudo systemctl enable --now stockmon
+#   journalctl -u stockmon -f
+[Unit]
+Description=Stock & display level monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=jetson
+WorkingDirectory=/home/jetson/stock-level-monitor
+# Keep secrets in a root-readable file: REOLINK_USER=..., REOLINK_PASS=..., TELEGRAM_BOT_TOKEN=..., TELEGRAM_CHAT_ID=...
+EnvironmentFile=/etc/stockmon.env
+ExecStart=/home/jetson/stock-level-monitor/.venv/bin/python app.py --config config.yaml
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

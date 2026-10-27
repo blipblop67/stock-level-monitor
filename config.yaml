@@ -1,0 +1,93 @@
+# Stock & display level monitor - main configuration
+# Paths are relative to this file.
+
+camera:
+  # snapshot : poll full-res JPEGs from the Reolink HTTP API (recommended, no video decode)
+  # rtsp     : read the RTSP stream (hardware decode via GStreamer when available)
+  # webcam   : USB webcam (live demo without an IP camera)
+  # file     : image file, folder of images, or video file (testing / demo)
+  source: snapshot
+  host: 192.168.1.100
+  http_port: 80
+  https: false
+  channel: 0
+  # Credentials are read from environment variables, never stored here.
+  user_env: REOLINK_USER
+  password_env: REOLINK_PASS
+  timeout_sec: 10
+
+  # RTSP options (source: rtsp)
+  rtsp_port: 554
+  rtsp_path: h264Preview_01_main   # or h264Preview_01_sub for the low-res stream
+  use_gstreamer: true              # needs OpenCV built with GStreamer (JetPack's OpenCV is)
+
+  # Webcam options (source: webcam)
+  device: 0
+  width: 1280
+  height: 720
+
+  # File options (source: file)
+  file: demo/frames
+  file_step: 1                     # for video files: frames to advance per reading
+  file_loop: true                  # false = stop at the end of the video
+
+interval_sec: 10                   # stock changes slowly; 5-30 s is plenty
+trays_file: trays.yaml             # written by roi_tool.py draw
+
+# reference : compare each tray against an "empty tray" photo (works day 1, no training)
+# yolo_seg  : custom-trained YOLO segmentation model (more robust, needs a dataset)
+estimator: reference
+
+reference:
+  image: refs/empty.jpg            # captured with: python roi_tool.py reference
+  diff_threshold: 22               # colour difference (delta-E) that counts as "product"
+  lightness_weight: 0.5            # <1 makes it less sensitive to lighting changes
+  blur: 5
+  min_blob_frac: 0.003             # ignore specks smaller than this share of the tray
+
+yolo_seg:
+  model: models/stock-seg.engine   # or .pt while testing
+  imgsz: 960
+  conf: 0.35
+  product_classes: []              # empty = every class counts as product
+
+occlusion:
+  # Skip readings while a person/arm covers a tray (otherwise hands count as stock).
+  person: true                     # YOLO person boxes (catches people standing still)
+  motion: true                     # frame differencing, no model (catches moving hands)
+  model: models/yolo11n.engine     # COCO model, falls back to yolo11n.pt if missing
+  imgsz: 640
+  conf: 0.4
+  max_overlap: 0.10                # skip the tray if >10% of it is covered
+  motion_threshold: 25             # grey-level change that counts as motion
+  motion_dilate: 0.03              # grow motion blobs by 3% of frame width
+  motion_gap_sec: 0.3              # gap between the two frames (snapshot/rtsp/webcam)
+  settle_readings: 1               # keep blocking this many readings after activity stops
+
+smoothing:
+  window: 5                        # median of the last N valid readings
+
+levels:
+  low: 0.35                        # below 35% fill -> LOW
+  empty: 0.10                      # below 10% fill -> EMPTY
+  hysteresis: 0.05                 # must cross a threshold by this much to change state
+  confirm_readings: 3              # consecutive readings needed before a state change
+
+alerts:
+  cooldown_min: 30                 # per tray, per state
+  notify_restock: true             # also send a message when a tray goes back to OK
+  telegram:
+    enabled: false
+    token_env: TELEGRAM_BOT_TOKEN
+    chat_id_env: TELEGRAM_CHAT_ID
+    send_photo: true
+
+output:
+  dir: output
+  save_annotated: true             # output/latest.jpg
+  csv: output/levels.csv
+
+dashboard:
+  enabled: true
+  host: 0.0.0.0
+  port: 8080

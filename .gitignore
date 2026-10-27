@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Models and datasets (large, device-specific)
+models/
+*.pt
+*.engine
+*.onnx
+dataset/
+runs/
+
+# Site-specific captures and output
+refs/
+output/
+
+# Generated demo media (recreate with tools/make_demo*.py)
+demo/frames/
+demo/video/
+demo/output/
+demo/empty.jpg
+demo/trays.yaml
+
+# Secrets
+*.env
+.env

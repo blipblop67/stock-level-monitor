@@ -1,0 +1,34 @@
+# Demo config: synthetic frames, no camera, no models needed.
+# python3 tools/make_demo.py && python3 app.py --config demo/config_demo.yaml --iterations 12
+camera:
+  source: file
+  file: frames
+interval_sec: 1
+trays_file: trays.yaml
+estimator: reference
+reference:
+  image: empty.jpg
+  diff_threshold: 22
+  lightness_weight: 0.5
+  blur: 5
+  min_blob_frac: 0.003
+occlusion:
+  enabled: false
+smoothing:
+  window: 3
+levels:
+  low: 0.35
+  empty: 0.10
+  hysteresis: 0.05
+  confirm_readings: 2
+alerts:
+  cooldown_min: 0
+  notify_restock: true
+  telegram:
+    enabled: false
+output:
+  dir: output
+  save_annotated: true
+  csv: output/levels.csv
+dashboard:
+  enabled: false

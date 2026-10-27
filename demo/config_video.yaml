@@ -1,0 +1,48 @@
+# Video demo: no camera, no AI model needed.
+#   python3 tools/make_demo_video.py
+#   python3 roi_tool.py calibrate --config demo/config_video.yaml --at 0
+#   python3 app.py --config demo/config_video.yaml --fast --show --save-video demo/output/annotated.mp4
+#
+# For your own phone video: change camera.file, then run roi_tool.py snapshot/draw/reference/calibrate
+# with --config demo/config_video.yaml (use --at <seconds> to pick the empty / full moments).
+camera:
+  source: file
+  file: video/stall_demo.mp4
+  file_step: 5            # one reading every 5 frames (15 fps video -> 3 readings per second)
+  file_loop: false
+interval_sec: 0
+trays_file: video/trays.yaml
+estimator: reference
+reference:
+  image: video/empty.jpg
+  diff_threshold: 22
+  lightness_weight: 0.5
+  blur: 5
+  min_blob_frac: 0.003
+  exposure_compensation: true
+occlusion:
+  person: false           # set true on the Jetson to add the YOLO person check
+  motion: true
+  max_overlap: 0.05
+  motion_threshold: 20
+  motion_dilate: 0.03
+  settle_readings: 1
+smoothing:
+  window: 5
+levels:
+  low: 0.35
+  empty: 0.10
+  hysteresis: 0.05
+  confirm_readings: 3
+alerts:
+  cooldown_min: 0
+  notify_restock: true
+  telegram:
+    enabled: false
+output:
+  dir: output
+  save_annotated: true
+  csv: output/levels_video.csv
+dashboard:
+  enabled: true
+  port: 8080

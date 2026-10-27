@@ -1,0 +1,19 @@
+# YOLO segmentation dataset (export from CVAT / Label Studio / Roboflow as "YOLO segmentation").
+#
+# dataset/
+#   images/train/*.jpg   labels/train/*.txt
+#   images/val/*.jpg     labels/val/*.txt
+#
+# Label the PRODUCT on the tray with polygons, not the tray itself.
+# Start with one generic class - it is enough for fill level and needs the least data.
+# Add per-product classes later only if you need per-product counts.
+path: ../dataset
+train: images/train
+val: images/val
+
+names:
+  0: product
+  # 1: fish
+  # 2: prawn
+  # 3: chicken
+  # 4: meat

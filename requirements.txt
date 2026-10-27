@@ -1,0 +1,5 @@
+# On Jetson use scripts/setup_jetson.sh instead (torch etc. must come from the Jetson AI Lab index).
+numpy<2
+pyyaml
+opencv-python      # Jetson: use JetPack's OpenCV instead (has GStreamer)
+ultralytics        # only needed for occlusion check / yolo_seg estimator

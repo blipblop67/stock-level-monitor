@@ -1,0 +1,9 @@
+# Tray / display regions. Normally written by: python roi_tool.py draw
+# Polygon points are normalised (0-1) so they work for snapshot, main and sub stream alike.
+trays:
+  - name: tray_1
+    label: Ikan Kembung
+    polygon: [[0.10, 0.45], [0.30, 0.45], [0.30, 0.75], [0.10, 0.75]]
+  - name: tray_2
+    label: Udang
+    polygon: [[0.32, 0.45], [0.52, 0.45], [0.52, 0.75], [0.32, 0.75]]
